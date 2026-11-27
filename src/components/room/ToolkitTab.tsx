@@ -84,6 +84,7 @@ export function ToolkitTab({
 
       <Suspense fallback={<p className="loading-state">Đang tải công cụ phòng…</p>}>
         <RoomToolkit
+          key={initialPanel ?? 'plan'}
           room={room}
           roomId={roomId}
           token={token}

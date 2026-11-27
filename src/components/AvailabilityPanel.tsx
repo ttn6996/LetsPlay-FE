@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   CheckOutlined,
   PlusOutlined,
@@ -41,22 +41,20 @@ export function AvailabilityPanel({ room, roomId, token, onRoom }: Props) {
   const [editing, setEditing] = useState(false)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
-  const [draftSelection, setDraftSelection] = useState<string[] | null>(null)
+  const [draftSelection, setDraftSelection] = useState<{ signature: string; ids: string[] } | null>(null)
 
   const isHost = room.member.role === 'HOST'
   const locked = room.phase === 'FINALIZED' || room.status === 'CANCELLED'
-  const slots = room.availabilitySlots ?? []
+  const slots = useMemo(() => room.availabilitySlots ?? [], [room.availabilitySlots])
   const slotSignature = slots.map(slot => slot.id).join(',')
   const savedSelection = slots.filter(slot => slot.availableByMe).map(slot => slot.id)
-  const selection = draftSelection ?? savedSelection
+  const selection = draftSelection?.signature === slotSignature ? draftSelection.ids : savedSelection
   const selectionChanged = [...selection].sort().join(',') !== [...savedSelection].sort().join(',')
 
   const recommendation = useMemo(
     () => slots.reduce<(typeof slots)[number] | null>((best, slot) => (!best || slot.availableCount > best.availableCount ? slot : best), null),
     [slots]
   )
-
-  useEffect(() => setDraftSelection(null), [slotSignature])
 
   async function saveOptions() {
     const title = draftTitle.trim()
@@ -95,7 +93,7 @@ export function AvailabilityPanel({ room, roomId, token, onRoom }: Props) {
     const next = new Set(selection)
     if (checked) next.add(slotId)
     else next.delete(slotId)
-    setDraftSelection([...next])
+    setDraftSelection({ signature: slotSignature, ids: [...next] })
     setMessage('')
   }
 

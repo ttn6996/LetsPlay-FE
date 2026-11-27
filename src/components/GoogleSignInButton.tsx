@@ -22,7 +22,7 @@ export function GoogleSignInButton({clientId,disabled=false,onCredential}:Props)
   const container=useRef<HTMLDivElement>(null)
   const callback=useRef(onCredential)
   const [loadError,setLoadError]=useState(false)
-  callback.current=onCredential
+  useEffect(()=>{callback.current=onCredential},[onCredential])
 
   useEffect(()=>{
     let cancelled=false

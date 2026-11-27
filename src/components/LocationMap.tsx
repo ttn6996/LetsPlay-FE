@@ -28,13 +28,14 @@ export function LocationMap({ location, meetup, mode, onSelect }: LocationMapPro
   }, [onSelect])
 
   const activePoint = mode === 'event' ? location : meetup
+  const initialPointRef = useRef(activePoint)
 
   useEffect(() => {
     if (!host.current || map.current) return
 
     let isCancelled = false
     try {
-      const initialPoint = mode === 'event' ? location : meetup
+      const initialPoint = initialPointRef.current
       const instance = new MapLibreMap({
         container: host.current,
         style: 'https://tiles.openfreemap.org/styles/bright',
@@ -82,7 +83,11 @@ export function LocationMap({ location, meetup, mode, onSelect }: LocationMapPro
       }
     } catch (err) {
       console.error('Failed to initialize map:', err)
-      setLoadError('Không thể khởi tạo bản đồ WebGL trên thiết bị này. Bạn có thể nhập địa chỉ hoặc dùng Google Maps.')
+      queueMicrotask(() => {
+        if (!isCancelled) {
+          setLoadError('Không thể khởi tạo bản đồ WebGL trên thiết bị này. Bạn có thể nhập địa chỉ hoặc dùng Google Maps.')
+        }
+      })
     }
   }, [])
 
