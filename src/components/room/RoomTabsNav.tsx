@@ -1,11 +1,12 @@
 import {
   ThunderboltOutlined,
   ClockCircleOutlined,
+  DollarOutlined,
   AppstoreOutlined,
   TeamOutlined,
 } from '@ant-design/icons'
 
-export type RoomTab = 'proposals' | 'availability' | 'toolkit' | 'members'
+export type RoomTab = 'proposals' | 'availability' | 'expenses' | 'toolkit' | 'members'
 
 interface RoomTabsNavProps {
   activeTab: RoomTab
@@ -23,11 +24,12 @@ export function RoomTabsNav({
   memberCount,
 }: RoomTabsNavProps) {
   return (
-    <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-2.5 p-2 bg-stone-100/90 border border-stone-200/90 rounded-2xl my-4">
+    <div className="w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 p-2 bg-stone-100/90 border border-stone-200/90 rounded-2xl my-4">
+      {/* TAB 1: Ý TƯỞNG & BÌNH CHỌN */}
       <button
         type="button"
         onClick={() => onTabChange('proposals')}
-        className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
+        className={`w-full flex items-center justify-center gap-2 px-3 py-3 rounded-xl text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
           activeTab === 'proposals'
             ? 'bg-white text-emerald-950 shadow-xs border border-stone-200 font-bold'
             : 'text-stone-600 hover:text-stone-900 hover:bg-stone-200/50 border border-transparent'
@@ -45,10 +47,11 @@ export function RoomTabsNav({
         )}
       </button>
 
+      {/* TAB 2: KHUNG GIỜ RẢNH */}
       <button
         type="button"
         onClick={() => onTabChange('availability')}
-        className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
+        className={`w-full flex items-center justify-center gap-2 px-3 py-3 rounded-xl text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
           activeTab === 'availability'
             ? 'bg-white text-emerald-950 shadow-xs border border-stone-200 font-bold'
             : 'text-stone-600 hover:text-stone-900 hover:bg-stone-200/50 border border-transparent'
@@ -66,10 +69,28 @@ export function RoomTabsNav({
         )}
       </button>
 
+      {/* TAB 3: CHIA TIỀN */}
+      <button
+        type="button"
+        onClick={() => onTabChange('expenses')}
+        className={`w-full flex items-center justify-center gap-2 px-3 py-3 rounded-xl text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
+          activeTab === 'expenses'
+            ? 'bg-white text-emerald-950 shadow-xs border border-stone-200 font-bold'
+            : 'text-stone-600 hover:text-stone-900 hover:bg-stone-200/50 border border-transparent'
+        }`}
+      >
+        <DollarOutlined
+          style={{ fontSize: 16 }}
+          className={activeTab === 'expenses' ? 'text-amber-700' : 'text-stone-400'}
+        />
+        <span>Chia tiền</span>
+      </button>
+
+      {/* TAB 4: CÔNG CỤ & KẾ HOẠCH */}
       <button
         type="button"
         onClick={() => onTabChange('toolkit')}
-        className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
+        className={`w-full flex items-center justify-center gap-2 px-3 py-3 rounded-xl text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
           activeTab === 'toolkit'
             ? 'bg-white text-emerald-950 shadow-xs border border-stone-200 font-bold'
             : 'text-stone-600 hover:text-stone-900 hover:bg-stone-200/50 border border-transparent'
@@ -82,10 +103,11 @@ export function RoomTabsNav({
         <span>Công cụ & Kế hoạch</span>
       </button>
 
+      {/* TAB 5: THÀNH VIÊN */}
       <button
         type="button"
         onClick={() => onTabChange('members')}
-        className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
+        className={`w-full flex items-center justify-center gap-2 px-3 py-3 rounded-xl text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
           activeTab === 'members'
             ? 'bg-white text-emerald-950 shadow-xs border border-stone-200 font-bold'
             : 'text-stone-600 hover:text-stone-900 hover:bg-stone-200/50 border border-transparent'
