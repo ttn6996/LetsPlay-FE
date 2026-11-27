@@ -422,7 +422,23 @@ export default function RoomPage() {
           </div>
         )}
 
-        {/* TAB 3: CÔNG CỤ & KẾ HOẠCH */}
+        {/* TAB 3: CHIA TIỀN */}
+        {roomTab === 'expenses' && (
+          <ToolkitTab
+            room={room}
+            roomId={roomId}
+            token={token}
+            onRoomUpdate={(updated) => {
+              if (updated.revision >= currentRevisionRef.current) {
+                currentRevisionRef.current = updated.revision
+                setRoom(updated)
+              }
+            }}
+            initialPanel="expenses"
+          />
+        )}
+
+        {/* TAB 4: CÔNG CỤ & KẾ HOẠCH */}
         {roomTab === 'toolkit' && (
           <ToolkitTab
             room={room}
@@ -434,6 +450,7 @@ export default function RoomPage() {
                 setRoom(updated)
               }
             }}
+            initialPanel="plan"
           />
         )}
 

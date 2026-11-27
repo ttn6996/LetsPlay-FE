@@ -32,13 +32,19 @@ export function RoomToolkit({
   roomId,
   token,
   onRoom,
+  initialPanel = 'plan',
 }: {
   room: Room
   roomId: string
   token: string
   onRoom: (room: Room) => void
+  initialPanel?: string
 }) {
-  const [panel, setPanel] = useState('plan')
+  const [panel, setPanel] = useState(initialPanel)
+
+  useEffect(() => {
+    if (initialPanel) setPanel(initialPanel)
+  }, [initialPanel])
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [data, setData] = useState<Awaited<ReturnType<typeof getRoomCollaboration>>['data'] | null>(

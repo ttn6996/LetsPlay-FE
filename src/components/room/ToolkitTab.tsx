@@ -15,6 +15,7 @@ interface ToolkitTabProps {
   roomId: string
   token: string
   onRoomUpdate: (updated: Room) => void
+  initialPanel?: string
 }
 
 export function ToolkitTab({
@@ -22,6 +23,7 @@ export function ToolkitTab({
   roomId,
   token,
   onRoomUpdate,
+  initialPanel,
 }: ToolkitTabProps) {
   return (
     <div className="w-full">
@@ -86,6 +88,7 @@ export function ToolkitTab({
           roomId={roomId}
           token={token}
           onRoom={onRoomUpdate}
+          initialPanel={initialPanel}
         />
       </Suspense>
     </div>
