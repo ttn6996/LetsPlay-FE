@@ -24,9 +24,8 @@ function loadGoogleIdentity() {
       'load',
       () => {
         window.clearTimeout(timer)
-        window.google?.accounts.oauth2
-          ? resolve()
-          : reject(new Error('Google Calendar OAuth không khả dụng.'))
+        if (window.google?.accounts.oauth2) resolve()
+        else reject(new Error('Google Calendar OAuth không khả dụng.'))
       },
       { once: true }
     )
@@ -46,7 +45,9 @@ export async function syncGoogleCalendar(room: Room, roomId: string, token: stri
   let clientId = ''
   try {
     clientId = (await getPushConfig()).data.googleClientId
-  } catch {}
+  } catch {
+    /* Optional push config */
+  }
   if (!clientId) throw new Error('Chưa cấu hình Google Sign-In cho ứng dụng.')
   await loadGoogleIdentity()
   const google = window.google?.accounts.oauth2

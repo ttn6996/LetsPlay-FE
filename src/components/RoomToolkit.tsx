@@ -41,10 +41,6 @@ export function RoomToolkit({
   initialPanel?: string
 }) {
   const [panel, setPanel] = useState(initialPanel)
-
-  useEffect(() => {
-    if (initialPanel) setPanel(initialPanel)
-  }, [initialPanel])
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [data, setData] = useState<Awaited<ReturnType<typeof getRoomCollaboration>>['data'] | null>(
@@ -69,7 +65,28 @@ export function RoomToolkit({
       : null
   )
 
-  const [weather, setWeather] = useState<{ chance: number | null; max: number | null } | null>(
+  const [syncedRoom, setSyncedRoom] = useState(room)
+  if (syncedRoom !== room) {
+    setSyncedRoom(room)
+    setName(room.name)
+    setDate(room.eventDate ?? '')
+    setTime(room.eventTime?.slice(0, 5) ?? '')
+    setRegion(room.region ?? '')
+    setNotes(room.planNotes ?? '')
+    setFallback(room.weatherFallback ?? '')
+    setLocation(
+      room.eventLatitude != null && room.eventLongitude != null
+        ? { lat: room.eventLatitude, lon: room.eventLongitude }
+        : null
+    )
+    setMeetup(
+      room.meetupLatitude != null && room.meetupLongitude != null
+        ? { lat: room.meetupLatitude, lon: room.meetupLongitude }
+        : null
+    )
+  }
+
+  const [weather, setWeather] = useState<{ key: string; chance: number | null; max: number | null } | null>(
     null
   )
 
@@ -131,33 +148,40 @@ export function RoomToolkit({
   }
 
   useEffect(() => {
-    void refresh()
-  }, [roomId, token, room.revision])
-
-  useEffect(() => {
-    setName(room.name)
-    setDate(room.eventDate ?? '')
-    setTime(room.eventTime?.slice(0, 5) ?? '')
-    setRegion(room.region ?? '')
-    setNotes(room.planNotes ?? '')
-    setFallback(room.weatherFallback ?? '')
-    setLocation(
-      room.eventLatitude != null && room.eventLongitude != null
-        ? { lat: room.eventLatitude, lon: room.eventLongitude }
-        : null
-    )
-    setMeetup(
-      room.meetupLatitude != null && room.meetupLongitude != null
-        ? { lat: room.meetupLatitude, lon: room.meetupLongitude }
-        : null
-    )
-  }, [room])
-
-  useEffect(() => {
-    if (!location || !date) {
-      setWeather(null)
-      return
+    let cancelled = false
+    Promise.all([getRoomCollaboration(roomId, token), getRoomExpenses(roomId, token)])
+      .then(([collab, expenses]) => {
+        if (cancelled) return
+        setData(collab.data)
+        setBook(expenses.data)
+        const p = collab.data.preferences.find((x) => x.membershipId === room.member.id)
+        if (p) {
+          setPrefs(p.preferences)
+          setBudgetMin(p.budgetMin ? String(p.budgetMin) : '')
+          setBudgetMax(p.budgetMax ? String(p.budgetMax) : '')
+        }
+        const r = collab.data.rides.find((x) => x.membershipId === room.member.id)
+        if (r) {
+          setHasVehicle(r.hasVehicle)
+          setSeats(String(r.seatsAvailable))
+          setPickup(r.pickupArea)
+          setRideNote(r.note)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setError('Không tải được dữ liệu hoạt động của phòng.')
+      })
+    return () => {
+      cancelled = true
     }
+  }, [roomId, token, room.revision, room.member.id])
+
+  const weatherKey = location && date ? `${location.lat},${location.lon},${date}` : ''
+  const activeWeather = weather?.key === weatherKey ? weather : null
+
+  useEffect(() => {
+    if (!location || !date) return
+    const currentKey = `${location.lat},${location.lon},${date}`
     let cancelled = false
     const url = new URL('https://api.open-meteo.com/v1/forecast')
     url.search = new URLSearchParams({
@@ -175,7 +199,7 @@ export function RoomToolkit({
         if (!cancelled) {
           const chance = payload.daily?.precipitation_probability_max?.[0] ?? null
           const max = payload.daily?.temperature_2m_max?.[0] ?? null
-          setWeather({ chance, max })
+          setWeather({ key: currentKey, chance, max })
           const key = `letsplay.weather.${roomId}.${date}`
           if (
             chance != null &&
@@ -535,7 +559,7 @@ export function RoomToolkit({
         <WeatherPanel
           location={location}
           date={date}
-          weather={weather}
+          weather={activeWeather}
           fallback={fallback}
         />
       )}

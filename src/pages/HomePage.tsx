@@ -112,10 +112,19 @@ export default function HomePage() {
   useEffect(() => {
     const code = (searchParams.get('code') ?? searchParams.get('invite') ?? '').trim().toUpperCase()
     if (!code) return
-    setTab('join')
+    let cancelled = false
     void previewRoom(code)
-      .then((response) => setPreview(response.data))
-      .catch((requestError) => setError(getApiError(requestError)))
+      .then((response) => {
+        if (cancelled) return
+        setTab('join')
+        setPreview(response.data)
+      })
+      .catch((requestError) => {
+        if (!cancelled) setError(getApiError(requestError))
+      })
+    return () => {
+      cancelled = true
+    }
   }, [searchParams])
 
   async function refreshRooms(token = getAccountToken()) {
