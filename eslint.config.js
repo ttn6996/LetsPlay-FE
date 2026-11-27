@@ -18,5 +18,14 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
     },
+    rules: {
+      'react-hooks/set-state-in-effect': 'warn',
+      'react-hooks/refs': 'warn',
+      'react-hooks/exhaustive-deps': 'warn',
+      'no-empty': 'warn',
+      '@typescript-eslint/no-unused-expressions': ['warn', { allowTernary: true, allowShortCircuit: true }],
+      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-explicit-any': 'warn',
+    },
   },
 ])

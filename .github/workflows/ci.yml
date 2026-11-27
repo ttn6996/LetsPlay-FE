@@ -1,0 +1,33 @@
+name: LetsPlay Frontend CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: letsplay-fe-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-build:
+    name: Lint, Type Check & Production Build (Node.js 20)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint Verification (ESLint)
+        run: npm run lint
+
+      - name: Type Check & Production Build (Vite)
+        run: npm run build
